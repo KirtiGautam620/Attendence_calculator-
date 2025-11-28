@@ -4,6 +4,7 @@ import { Link } from 'expo-router';
 import { useEffect,useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Button } from '@react-navigation/elements';
+
 const quickLinks=[
   {title:'Mark Attendance',subtitle:'Swipe by batch & date',href:'/(tabs)/attendance'},
   {title:'Insights',subtitle:'Stats & defaulters',href:'/(tabs)/insights'},
