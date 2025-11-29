@@ -14,9 +14,9 @@ import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const STATUS_OPTIONS = [
-  { key: 'PRESENT', label: 'Present', color: '#22c55e' },
-  { key: 'ABSENT', label: 'Absent', color: '#ef4444' },
-  { key: 'LATE', label: 'Late', color: '#fbbf24' },
+  { key: 'PRESENT', label: 'Present', color: '#ffffffff' },
+  { key: 'ABSENT', label: 'Absent', color: '#f40000ff' },
+  { key: 'LATE', label: 'Late', color: '#ffb702ff' },
 ];
 
 export default function AttendanceScreen() {
@@ -229,7 +229,7 @@ const styles = StyleSheet.create({
   backButton: { 
     paddingVertical: 8,
     paddingHorizontal: 16,
-    backgroundColor: '#166534',
+    backgroundColor: '#42ab65ff',
     borderRadius: 12,
     alignSelf: 'flex-start',
     marginBottom: 12 
@@ -249,7 +249,7 @@ const styles = StyleSheet.create({
 
   pickerWrapper: { 
     flex: 1,
-    backgroundColor: '#126835',
+    backgroundColor: '#42ab65ff',
     borderRadius: 14 
   },
 
@@ -259,7 +259,7 @@ const styles = StyleSheet.create({
 
   datePickerButton: { 
     width: 150,
-    backgroundColor: '#0f6330',
+    backgroundColor: '#42ab65ff',
     borderRadius: 14,
     paddingVertical: 12,
     justifyContent: 'center',
@@ -284,7 +284,7 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     padding: 12,
     alignItems: 'center',
-    backgroundColor: '#166534' 
+    backgroundColor: '#42ab65ff',
   },
 
   summaryValue: { 
@@ -299,7 +299,7 @@ const styles = StyleSheet.create({
   },
 
   row: { 
-    backgroundColor: '#14532d',
+    backgroundColor: '#42ab65ff',
     borderRadius: 18,
     padding: 16,
     marginBottom: 12,
@@ -339,7 +339,7 @@ const styles = StyleSheet.create({
   },
 
   emptyState: { 
-    color: '#c7d2ca',
+    color: '#000000ff',
     textAlign: 'center',
     marginTop: 60 
   },

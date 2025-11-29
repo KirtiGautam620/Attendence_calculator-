@@ -123,21 +123,21 @@ export default function StudentsScreen() {
         <TextInput
           style={styles.input}
           placeholder="Full name"
-          placeholderTextColor="#94a3b8"
+          placeholderTextColor="#687689ff"
           value={form.name}
           onChangeText={(text) => setForm((prev) => ({ ...prev, name: text }))}
         />
         <TextInput
           style={styles.input}
           placeholder="Roll number"
-          placeholderTextColor="#94a3b8"
+          placeholderTextColor="#687689ff"
           value={form.rollNumber}
           onChangeText={(text) => setForm((prev) => ({ ...prev, rollNumber: text }))}
         />
         <TextInput
           style={styles.input}
           placeholder="Contact number"
-          placeholderTextColor="#94a3b8"
+          placeholderTextColor="#687689ff"
           value={form.contactNumber}
           onChangeText={(text) => setForm((prev) => ({ ...prev, contactNumber: text }))}
         />
@@ -246,7 +246,7 @@ const styles = StyleSheet.create({
   backButton: {
     paddingVertical: 6,
     paddingHorizontal: 12,
-    backgroundColor: '#0c3b2eff',
+    backgroundColor: '#42ab65ff',
     borderRadius: 10,
     alignSelf: 'flex-start',
     marginBottom: 10,
@@ -264,7 +264,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   card: {
-    backgroundColor: '#0b4029ff',
+    backgroundColor: '#42ab65ff',
     borderRadius: 20,
     paddingVertical: 16,
     paddingHorizontal: 16,
@@ -289,7 +289,7 @@ const styles = StyleSheet.create({
     color: '#0b0b0bff',
   },
   button: {
-    backgroundColor: '#22c55e',
+    backgroundColor: '#42ab65ff',
     borderRadius: 14,
     paddingVertical: 12,
     alignItems: 'center',
@@ -342,7 +342,7 @@ const styles = StyleSheet.create({
     marginTop: 6,
   },
   empty: {
-    color: '#a7f3d0',
+    color: '#000000ff',
     textAlign: 'center',
     marginTop: 20,
   },

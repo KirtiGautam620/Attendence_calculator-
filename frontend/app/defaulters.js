@@ -164,7 +164,7 @@ const styles = StyleSheet.create({
   backButton: {
     paddingVertical: 6,
     paddingHorizontal: 12,
-    backgroundColor: '#0c3b2eff',
+    backgroundColor: '#42ab65ff',
     borderRadius: 10,
     alignSelf: 'flex-start',
     marginBottom: 10,
@@ -181,7 +181,7 @@ const styles = StyleSheet.create({
     marginVertical: 12,
   },
   card: {
-    backgroundColor: '#0b6b35ff',
+    backgroundColor: '#42ab65ff',
     borderRadius: 20,
     padding: 16,
     gap: 12,
@@ -215,7 +215,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   entryCard: {
-    backgroundColor: '#0c532aff',
+    backgroundColor: '#42ab65ff',
     borderRadius: 18,
     padding: 16,
     marginBottom: 12,
@@ -231,7 +231,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   entryMeta: {
-    color: '#94a3b8',
+    color: '#fdfeffff',
     marginTop: 2,
   },
   entryPercent: {

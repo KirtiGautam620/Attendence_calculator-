@@ -78,7 +78,7 @@ export default function BatchesScreen() {
         <TextInput
           style={styles.input}
           placeholder="Schedule (e.g. Mon-Fri 5-7 PM)"
-          placeholderTextColor="#94a3b8"
+          placeholderTextColor="#8796acff"
           value={form.schedule}
           onChangeText={(text) => setForm((prev) => ({ ...prev, schedule: text }))}
         />
@@ -115,7 +115,7 @@ const styles = StyleSheet.create({
   backButton: { 
     paddingVertical: 6,
      paddingHorizontal: 12, 
-     backgroundColor: '#0c3b2eff', 
+     backgroundColor: '#42ab65ff', 
      borderRadius: 10, alignSelf: 'flex-start', 
      marginBottom: 10 },
   backButtonText: { 
@@ -128,7 +128,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginVertical: 12 },
   card: { 
-    backgroundColor: '#0c8735ff', 
+    backgroundColor: '#42ab65ff',
     borderRadius: 20, 
     padding: 16, 
     gap: 12 },
@@ -139,7 +139,7 @@ const styles = StyleSheet.create({
      paddingVertical: 12, 
      color: '#121313ff' },
   button: { 
-    backgroundColor: '#08583bff', 
+    backgroundColor: '#42ab65ff', 
     borderRadius: 14, 
     paddingVertical: 12, 
     alignItems: 'center' },
@@ -148,7 +148,7 @@ const styles = StyleSheet.create({
     fontWeight: '600', 
     fontSize: 15 },
   batchCard: { 
-    backgroundColor: '#186739ff', 
+    backgroundColor: '#42ab65ff',
     borderRadius: 18, 
     padding: 16, 
     marginBottom: 12, 
@@ -156,7 +156,7 @@ const styles = StyleSheet.create({
     borderColor: '#1e293b' },
   batchTitle: { color: '#f7f9faff', fontSize: 17, fontWeight: '600' },
   batchDesc: { color: '#cbd5f5', marginVertical: 4 },
-  batchMeta: { color: '#94a3b8', fontSize: 13 },
+  batchMeta: { color: '#ffffffff', fontSize: 13 },
   batchMetaTime: { color: '#0c0c0cff' },
   empty: { color: '#94a3b8', textAlign: 'center', marginTop: 24 },
 });
