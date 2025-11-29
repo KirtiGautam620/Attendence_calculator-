@@ -106,15 +106,14 @@ export default function StudentsScreen() {
     loadStudents(selectedBatchFilter);
   };
 
+  const handleClearAll = async () => {
+    await AsyncStorage.removeItem('students');
+    setStudents([]);
+  };
+
   return (
-    <ScrollView
-      style={styles.container}
-      contentContainerStyle={{ paddingBottom: 40 }}
-    >
-      <TouchableOpacity
-        onPress={() => router.back()}
-        style={styles.backButton}
-      >
+    <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 40 }}>
+      <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
         <Text style={styles.backButtonText}>← Back</Text>
       </TouchableOpacity>
 
@@ -142,11 +141,8 @@ export default function StudentsScreen() {
           value={form.contactNumber}
           onChangeText={(text) => setForm((prev) => ({ ...prev, contactNumber: text }))}
         />
-        <TouchableOpacity
-          style={styles.button}
-          onPress={handleSubmit}
-          disabled={saving}
-        >
+
+        <TouchableOpacity style={styles.button} onPress={handleSubmit} disabled={saving}>
           <Text style={styles.buttonText}>
             {saving ? 'Saving…' : form._id ? 'Update Student' : 'Save Student'}
           </Text>
@@ -155,6 +151,7 @@ export default function StudentsScreen() {
 
       <View style={styles.listHeader}>
         <Text style={styles.header}>Students</Text>
+
         <View style={[styles.pickerWrapper, { width: 180 }]}>
           <Picker
             selectedValue={selectedBatchFilter}
@@ -162,11 +159,7 @@ export default function StudentsScreen() {
             style={styles.picker}
             dropdownIconColor="#38bdf8"
           >
-            <Picker.Item
-              label="All batches"
-              value=""
-              color="#121312ff"
-            />
+            <Picker.Item label="All batches" value="" color="#121312ff" />
             {batches.map((batch) => (
               <Picker.Item
                 key={batch._id}
@@ -179,6 +172,10 @@ export default function StudentsScreen() {
         </View>
       </View>
 
+      <TouchableOpacity style={styles.clearButton} onPress={handleClearAll}>
+        <Text style={styles.clearButtonText}>Clear All Students</Text>
+      </TouchableOpacity>
+
       {loading ? (
         <ActivityIndicator color="#22c55e" />
       ) : students.length ? (
@@ -187,46 +184,35 @@ export default function StudentsScreen() {
             <View>
               <Text style={styles.studentName}>
                 {student.name}{' '}
-                <Text
-                  style={{
-                    color: '#d1fae5',
-                    fontSize: 13,
-                  }}
-                >
-                  #{student.rollNumber}
-                </Text>
+                <Text style={{ color: '#d1fae5', fontSize: 13 }}>#{student.rollNumber}</Text>
               </Text>
+
               {student.batch ? (
                 <Text style={styles.studentMeta}>
                   {batches.find((b) => b._id === student.batch)?.name}
                 </Text>
               ) : null}
+
               {student.contactNumber ? (
-                <Text style={styles.studentContact}>
-                  ☎ {student.contactNumber}
-                </Text>
+                <Text style={styles.studentContact}>☎ {student.contactNumber}</Text>
               ) : null}
             </View>
 
-            <View
-              style={{
-                flexDirection: 'row',
-                gap: 10,
-                marginTop: 10,
-              }}
-            >
+            <View style={{ flexDirection: 'row', gap: 10, marginTop: 10 }}>
               <TouchableOpacity
                 style={[styles.actionButton, { backgroundColor: '#fbbf24' }]}
                 onPress={() => handleEdit(student)}
               >
                 <Text style={styles.actionText}>Edit</Text>
               </TouchableOpacity>
+
               <TouchableOpacity
                 style={[styles.actionButton, { backgroundColor: '#ef4444' }]}
                 onPress={() => handleDelete(student._id)}
               >
                 <Text style={styles.actionText}>Delete</Text>
               </TouchableOpacity>
+
               <TouchableOpacity
                 style={{
                   backgroundColor: '#38bdf8',
@@ -237,13 +223,7 @@ export default function StudentsScreen() {
                 }}
                 onPress={() => router.push('/(tabs)/studentqr')}
               >
-                <Text
-                  style={{
-                    color: 'white',
-                    fontWeight: '600',
-                    textAlign: 'center',
-                  }}
-                >
+                <Text style={{ color: 'white', fontWeight: '600', textAlign: 'center' }}>
                   QR
                 </Text>
               </TouchableOpacity>
@@ -251,15 +231,7 @@ export default function StudentsScreen() {
           </View>
         ))
       ) : (
-        <Text
-          style={{
-            color: '#a7f3d0',
-            textAlign: 'center',
-            marginTop: 20,
-          }}
-        >
-          No students found for this filter.
-        </Text>
+        <Text style={styles.empty}>No students found for this filter.</Text>
       )}
     </ScrollView>
   );
@@ -334,6 +306,18 @@ const styles = StyleSheet.create({
     marginTop: 12,
     marginBottom: 12,
   },
+  clearButton: {
+    backgroundColor: '#7f1d1d',
+    paddingVertical: 10,
+    borderRadius: 12,
+    marginBottom: 14,
+  },
+  clearButtonText: {
+    color: '#ffffff',
+    textAlign: 'center',
+    fontSize: 14,
+    fontWeight: '600',
+  },
   studentCard: {
     backgroundColor: '#0b3e28',
     borderRadius: 18,
@@ -364,10 +348,9 @@ const styles = StyleSheet.create({
   },
   actionButton: {
     flex: 1,
-    flexDirection: 'row',
+    borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 12,
   },
   actionText: {
     color: '#f8fafc',
