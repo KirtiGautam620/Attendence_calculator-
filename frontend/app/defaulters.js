@@ -1,17 +1,18 @@
 import { Picker } from '@react-native-picker/picker';
 import { useEffect, useState } from 'react';
+import { useRouter } from 'expo-router';
 import {
   ActivityIndicator,
   ScrollView,
   StyleSheet,
   Text,
   TextInput,
+  TouchableOpacity,
   View,
 } from 'react-native';
 
-// import { BatchService, ReportsService } from '../src/services/api';
-
 export default function DefaultersScreen() {
+  const router = useRouter();
   const [batches, setBatches] = useState([]);
   const [selectedBatch, setSelectedBatch] = useState('');
   const [month, setMonth] = useState(String(new Date().getMonth() + 1));
@@ -21,64 +22,48 @@ export default function DefaultersScreen() {
   const [entries, setEntries] = useState([]);
 
   const dummyBatches = [
-  { _id: 'b1', name: 'Batch A' },
-  { _id: 'b2', name: 'Batch B' },
-];
+    { _id: 'b1', name: 'Batch A' },
+    { _id: 'b2', name: 'Batch B' },
+  ];
 
-const dummyEntries = [
-  {
-    student: { _id: 's1', name: 'Rohit Sharma', rollNumber: 21 },
-    percentage: 68,
-  },
-  {
-    student: { _id: 's2', name: 'Neha Verma', rollNumber: 14 },
-    percentage: 72,
-  },
-  {
-    student: { _id: 's3', name: 'Karan Singh', rollNumber: 5 },
-    percentage: 60,
-  },
-];
+  const dummyEntries = [
+    {
+      student: { _id: 's1', name: 'Rohit Sharma', rollNumber: 21 },
+      percentage: 68,
+    },
+    {
+      student: { _id: 's2', name: 'Neha Verma', rollNumber: 14 },
+      percentage: 72,
+    },
+    {
+      student: { _id: 's3', name: 'Karan Singh', rollNumber: 5 },
+      percentage: 60,
+    },
+  ];
 
-useEffect(() => {
-  setBatches(dummyBatches);
-  setSelectedBatch('b1');
-}, []);
+  useEffect(() => {
+    setBatches(dummyBatches);
+    setSelectedBatch('b1');
+  }, []);
 
-useEffect(() => {
-  setLoading(true);
-  const filtered = dummyEntries.filter(
-    (e) => e.percentage < Number(threshold)
-  );
-
-  setEntries(filtered);
-  setLoading(false);
-}, [selectedBatch, month, year, threshold]);
-
-  // useEffect(() => {
-  //   const loadBatches = async () => {
-  //     const data = await BatchService.list();
-  //     setBatches(data);
-  //     setSelectedBatch((prev) => prev || (data[0]?._id ?? ''));
-  //   };
-  //   loadBatches();
-  // }, []);
-
-  // useEffect(() => {
-  //   if (!selectedBatch) return;
-  //   setLoading(true);
-  //   ReportsService.defaulters({
-  //     batch: selectedBatch,
-  //     month: Number(month),
-  //     year: Number(year),
-  //     threshold: Number(threshold),
-  //   })
-  //     .then(setEntries)
-  //     .finally(() => setLoading(false));
-  // }, [selectedBatch, month, year, threshold]);
+  useEffect(() => {
+    setLoading(true);
+    const filtered = dummyEntries.filter(
+      (e) => e.percentage < Number(threshold)
+    );
+    setEntries(filtered);
+    setLoading(false);
+  }, [selectedBatch, month, year, threshold]);
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 40 }}>
+      <TouchableOpacity
+        onPress={() => router.back()}
+        style={styles.backButton}
+      >
+        <Text style={styles.backButtonText}>← Back</Text>
+      </TouchableOpacity>
+
       <Text style={styles.header}>Defaulter Filters</Text>
       <View style={styles.card}>
         <View style={styles.pickerWrapper}>
@@ -93,7 +78,7 @@ useEffect(() => {
             ))}
           </Picker>
         </View>
-         <Text style={styles.inputLabel}>Batch</Text>
+        <Text style={styles.inputLabel}>Batch</Text>
         <View style={styles.filters}>
           <View style={styles.inputContainer}>
             <TextInput
@@ -157,6 +142,19 @@ const styles = StyleSheet.create({
     backgroundColor: '#f7f8fbff',
     padding: 16,
   },
+  backButton: {
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    backgroundColor: '#0c3b2eff',
+    borderRadius: 10,
+    alignSelf: 'flex-start',
+    marginBottom: 10,
+  },
+  backButtonText: {
+    color: '#e2f7eb',
+    fontSize: 14,
+    fontWeight: '600',
+  },
   header: {
     color: '#f8fafc',
     fontSize: 18,
@@ -194,7 +192,7 @@ const styles = StyleSheet.create({
     color: '#060606ff',
     fontSize: 12,
     fontWeight: '600',
-    marginTop:1,
+    marginTop: 1,
     textAlign: 'center',
   },
   entryCard: {
