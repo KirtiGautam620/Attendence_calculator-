@@ -11,6 +11,7 @@ import {
   View,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+
 export default function StudentsScreen() {
   const router = useRouter();
   const [batches, setBatches] = useState([]);
@@ -25,12 +26,14 @@ export default function StudentsScreen() {
   });
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
+
   const loadBatches = async () => {
     const stored = await AsyncStorage.getItem('batches');
     const parsed = stored ? JSON.parse(stored) : [];
     setBatches(parsed);
-    setForm((prev) => ({ ...prev, batch: parsed[0]?._id || '' }));
+    setSelectedBatchFilter(parsed[0]?._id || '');
   };
+
   const loadStudents = async (batchId = '') => {
     setLoading(true);
     const stored = await AsyncStorage.getItem('students');
@@ -42,28 +45,31 @@ export default function StudentsScreen() {
     }
     setLoading(false);
   };
+
   useEffect(() => {
     loadBatches();
     loadStudents();
   }, []);
+
   useEffect(() => {
     loadStudents(selectedBatchFilter);
+    setForm((prev) => ({ ...prev, batch: selectedBatchFilter }));
   }, [selectedBatchFilter]);
+
   const saveStudents = async (newStudents) => {
     await AsyncStorage.setItem('students', JSON.stringify(newStudents));
   };
+
   const handleSubmit = async () => {
-    if (!form.name.trim()) return;
-    if (!form.rollNumber.trim()) return;
-    if (!form.batch) return;
+    if (!form.name.trim() || !form.rollNumber.trim() || !form.batch) return;
     setSaving(true);
+
     const stored = await AsyncStorage.getItem('students');
     const currentStudents = stored ? JSON.parse(stored) : [];
+
     if (form._id) {
       const index = currentStudents.findIndex((s) => s._id === form._id);
-      if (index !== -1) {
-        currentStudents[index] = { ...form };
-      }
+      if (index !== -1) currentStudents[index] = { ...form };
     } else {
       currentStudents.push({
         _id: Date.now().toString(),
@@ -73,20 +79,25 @@ export default function StudentsScreen() {
         contactNumber: form.contactNumber,
       });
     }
+
     await saveStudents(currentStudents);
+
     setForm({
       name: '',
       rollNumber: '',
-      batch: batches[0]?._id || '',
+      batch: selectedBatchFilter,
       contactNumber: '',
       _id: null,
     });
+
     loadStudents(selectedBatchFilter);
     setSaving(false);
   };
+
   const handleEdit = (student) => {
     setForm({ ...student });
   };
+
   const handleDelete = async (id) => {
     const stored = await AsyncStorage.getItem('students');
     const currentStudents = stored ? JSON.parse(stored) : [];
@@ -94,6 +105,7 @@ export default function StudentsScreen() {
     await saveStudents(filtered);
     loadStudents(selectedBatchFilter);
   };
+
   return (
     <ScrollView
       style={styles.container}
@@ -105,52 +117,30 @@ export default function StudentsScreen() {
       >
         <Text style={styles.backButtonText}>← Back</Text>
       </TouchableOpacity>
+
       <Text style={styles.header}>Add / Edit Student</Text>
+
       <View style={styles.card}>
         <TextInput
           style={styles.input}
           placeholder="Full name"
-          placeholderTextColor="#94A3B8"
+          placeholderTextColor="#94a3b8"
           value={form.name}
-          onChangeText={(text) =>
-            setForm((prev) => ({ ...prev, name: text }))
-          }
+          onChangeText={(text) => setForm((prev) => ({ ...prev, name: text }))}
         />
         <TextInput
           style={styles.input}
           placeholder="Roll number"
-          placeholderTextColor="#94A3B8"
+          placeholderTextColor="#94a3b8"
           value={form.rollNumber}
-          onChangeText={(text) =>
-            setForm((prev) => ({ ...prev, rollNumber: text }))
-          }
+          onChangeText={(text) => setForm((prev) => ({ ...prev, rollNumber: text }))}
         />
-        <View style={styles.pickerWrapper}>
-          <Picker
-            selectedValue={form.batch}
-            onValueChange={(value) => setForm((prev) => ({ ...prev, batch: value }))}
-            style={styles.picker}
-            dropdownIconColor="#38BDF8"
-          >
-            <Picker.Item label="Select batch" value="" color="#888" />
-            {batches.map((batch) => (
-              <Picker.Item
-                key={batch._id}
-                label={batch.name}
-                value={batch._id}
-                color="#070707ff"
-              />
-            ))}
-          </Picker>
-        </View>
         <TextInput
           style={styles.input}
           placeholder="Contact number"
-          placeholderTextColor="#94A3B8"
+          placeholderTextColor="#94a3b8"
           value={form.contactNumber}
-          onChangeText={(text) =>
-            setForm((prev) => ({ ...prev, contactNumber: text }))
-          }
+          onChangeText={(text) => setForm((prev) => ({ ...prev, contactNumber: text }))}
         />
         <TouchableOpacity
           style={styles.button}
@@ -162,6 +152,7 @@ export default function StudentsScreen() {
           </Text>
         </TouchableOpacity>
       </View>
+
       <View style={styles.listHeader}>
         <Text style={styles.header}>Students</Text>
         <View style={[styles.pickerWrapper, { width: 180 }]}>
@@ -169,9 +160,13 @@ export default function StudentsScreen() {
             selectedValue={selectedBatchFilter}
             onValueChange={setSelectedBatchFilter}
             style={styles.picker}
-            dropdownIconColor="#38BDF8"
+            dropdownIconColor="#38bdf8"
           >
-            <Picker.Item label="All batches" value="" color="#121312ff" />
+            <Picker.Item
+              label="All batches"
+              value=""
+              color="#121312ff"
+            />
             {batches.map((batch) => (
               <Picker.Item
                 key={batch._id}
@@ -183,15 +178,21 @@ export default function StudentsScreen() {
           </Picker>
         </View>
       </View>
+
       {loading ? (
-        <ActivityIndicator color="#22C55E" />
+        <ActivityIndicator color="#22c55e" />
       ) : students.length ? (
         students.map((student) => (
           <View key={student._id} style={styles.studentCard}>
             <View>
               <Text style={styles.studentName}>
                 {student.name}{' '}
-                <Text style={{ color: '#D1FAE5', fontSize: 13 }}>
+                <Text
+                  style={{
+                    color: '#d1fae5',
+                    fontSize: 13,
+                  }}
+                >
                   #{student.rollNumber}
                 </Text>
               </Text>
@@ -202,26 +203,33 @@ export default function StudentsScreen() {
               ) : null}
               {student.contactNumber ? (
                 <Text style={styles.studentContact}>
-                  :phone: {student.contactNumber}
+                  ☎ {student.contactNumber}
                 </Text>
               ) : null}
             </View>
-            <View style={{ flexDirection: 'row', gap: 10, marginTop: 10 }}>
+
+            <View
+              style={{
+                flexDirection: 'row',
+                gap: 10,
+                marginTop: 10,
+              }}
+            >
               <TouchableOpacity
-                style={[styles.actionButton, { backgroundColor: '#FBBF24' }]}
+                style={[styles.actionButton, { backgroundColor: '#fbbf24' }]}
                 onPress={() => handleEdit(student)}
               >
                 <Text style={styles.actionText}>Edit</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={[styles.actionButton, { backgroundColor: '#EF4444' }]}
+                style={[styles.actionButton, { backgroundColor: '#ef4444' }]}
                 onPress={() => handleDelete(student._id)}
               >
                 <Text style={styles.actionText}>Delete</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={{
-                  backgroundColor: '#38BDF8',
+                  backgroundColor: '#38bdf8',
                   paddingVertical: 10,
                   paddingHorizontal: 10,
                   borderRadius: 12,
@@ -243,11 +251,20 @@ export default function StudentsScreen() {
           </View>
         ))
       ) : (
-        <Text style={styles.empty}>No students found for this filter.</Text>
+        <Text
+          style={{
+            color: '#a7f3d0',
+            textAlign: 'center',
+            marginTop: 20,
+          }}
+        >
+          No students found for this filter.
+        </Text>
       )}
     </ScrollView>
   );
 }
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -263,7 +280,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   backButtonText: {
-    color: '#E2F7EB',
+    color: '#e2f7eb',
     fontSize: 14,
     fontWeight: '600',
   },
@@ -300,14 +317,14 @@ const styles = StyleSheet.create({
     color: '#0b0b0bff',
   },
   button: {
-    backgroundColor: '#22C55E',
+    backgroundColor: '#22c55e',
     borderRadius: 14,
     paddingVertical: 12,
     alignItems: 'center',
     marginTop: 4,
   },
   buttonText: {
-    color: '#064E2F',
+    color: '#064e2f',
     fontWeight: '600',
   },
   listHeader: {
@@ -318,13 +335,13 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   studentCard: {
-    backgroundColor: '#0B3E28',
+    backgroundColor: '#0b3e28',
     borderRadius: 18,
     paddingVertical: 16,
     paddingHorizontal: 16,
     marginBottom: 12,
     borderWidth: 1,
-    borderColor: '#1E293B',
+    borderColor: '#1e293b',
   },
   studentName: {
     color: '#ede8e8ff',
@@ -332,16 +349,16 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   studentMeta: {
-    color: '#A7F3D0',
+    color: '#a7f3d0',
     marginTop: 4,
   },
   studentContact: {
-    color: '#A7F3D0',
+    color: '#a7f3d0',
     fontSize: 13,
     marginTop: 6,
   },
   empty: {
-    color: '#A7F3D0',
+    color: '#a7f3d0',
     textAlign: 'center',
     marginTop: 20,
   },
@@ -353,7 +370,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   actionText: {
-    color: '#F8FAFC',
+    color: '#f8fafc',
     fontWeight: '600',
   },
 });
