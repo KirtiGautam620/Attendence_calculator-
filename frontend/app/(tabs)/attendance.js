@@ -5,7 +5,6 @@ import {
   ActivityIndicator,
   FlatList,
   Platform,
-  RefreshControl,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -50,7 +49,6 @@ export default function AttendanceScreen() {
     const stored = await AsyncStorage.getItem('attendance');
     const data = stored ? JSON.parse(stored) : {};
     const saved = data?.[batchId]?.[selectedDate] || [];
-
     const filtered = students.filter(s => s.batch === batchId);
 
     const mapped = filtered.map(student => {
@@ -83,11 +81,14 @@ export default function AttendanceScreen() {
     );
   };
 
-  const handleDateChange = (event, selectedDate) => {
+  const handleDateChange = (event, selectedDateValue) => {
     if (Platform.OS === 'android') setShowDatePicker(false);
-    if (selectedDate) {
-      const formatted = selectedDate.toISOString().split('T')[0];
+    if (selectedDateValue) {
+      const formatted = selectedDateValue.toISOString().split('T')[0];
       setDate(formatted);
+      setTimeout(() => {
+        loadAttendanceForDate(selectedBatch, formatted);
+      }, 50);
     }
   };
 
@@ -219,73 +220,85 @@ export default function AttendanceScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
+  container: { 
     flex: 1,
     backgroundColor: '#f5f9f7',
-    padding: 16,
+    padding: 16 
   },
-  backButton: {
+
+  backButton: { 
     paddingVertical: 8,
     paddingHorizontal: 16,
     backgroundColor: '#166534',
     borderRadius: 12,
     alignSelf: 'flex-start',
-    marginBottom: 12,
+    marginBottom: 12 
   },
-  backButtonText: {
+
+  backButtonText: { 
     color: '#d1fae5',
     fontWeight: '600',
-    fontSize: 16,
+    fontSize: 16 
   },
-  filters: {
+
+  filters: { 
     flexDirection: 'row',
     gap: 12,
-    marginBottom: 12,
+    marginBottom: 12 
   },
-  pickerWrapper: {
+
+  pickerWrapper: { 
     flex: 1,
     backgroundColor: '#126835',
-    borderRadius: 14,
+    borderRadius: 14 
   },
-  picker: {
-    color: '#fafef9',
+
+  picker: { 
+    color: '#fafef9' 
   },
-  datePickerButton: {
+
+  datePickerButton: { 
     width: 150,
     backgroundColor: '#0f6330',
     borderRadius: 14,
     paddingVertical: 12,
     justifyContent: 'center',
-    alignItems: 'center',
+    alignItems: 'center' 
   },
-  datePickerButtonText: {
+
+  datePickerButtonText: { 
     color: '#eef0ea',
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: '600' 
   },
-  summaryRow: {
+
+  summaryRow: { 
     flexDirection: 'row',
     gap: 12,
-    marginBottom: 12,
+    marginBottom: 12 
   },
-  summaryCard: {
+
+  summaryCard: { 
     flex: 1,
     borderWidth: 1,
     borderRadius: 18,
     padding: 12,
     alignItems: 'center',
-    backgroundColor: '#166534',
+    backgroundColor: '#166534' 
   },
-  summaryValue: {
+
+  summaryValue: { 
     color: '#f1f3ec',
     fontSize: 22,
-    fontWeight: '700',
+    fontWeight: '700' 
   },
-  summaryLabel: {
+
+  summaryLabel: { 
     fontSize: 12,
-    fontWeight: '600',
+    fontWeight: '600' 
   },
-  row: {
+
+  row: { 
     backgroundColor: '#14532d',
     borderRadius: 18,
     padding: 16,
@@ -293,38 +306,45 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     borderWidth: 1,
-    borderColor: '#239d51',
+    borderColor: '#239d51' 
   },
-  name: {
+
+  name: { 
     color: '#d9f99d',
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: '600' 
   },
-  meta: {
+
+  meta: { 
     color: '#d9f9de',
-    marginTop: 2,
+    marginTop: 2 
   },
-  statusGroup: {
+
+  statusGroup: { 
     flexDirection: 'row',
-    gap: 6,
+    gap: 6 
   },
-  statusButton: {
+
+  statusButton: { 
     borderRadius: 999,
     borderWidth: 1,
     paddingVertical: 6,
     paddingHorizontal: 12,
-    borderColor: '#e3f6ea',
+    borderColor: '#e3f6ea' 
   },
-  statusLabel: {
+
+  statusLabel: { 
     color: '#ddf6e0',
-    fontWeight: '600',
+    fontWeight: '600' 
   },
-  emptyState: {
+
+  emptyState: { 
     color: '#c7d2ca',
     textAlign: 'center',
-    marginTop: 60,
+    marginTop: 60 
   },
-  saveButton: {
+
+  saveButton: { 
     backgroundColor: '#22c55e',
     borderRadius: 18,
     padding: 16,
@@ -332,14 +352,16 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 80,
     left: 16,
-    right: 16,
+    right: 16 
   },
-  saveButtonText: {
+
+  saveButtonText: { 
     color: '#14532d',
     fontWeight: '700',
-    fontSize: 16,
+    fontSize: 16 
   },
-  clearButton: {
+
+  clearButton: { 
     backgroundColor: '#dc2626',
     borderRadius: 18,
     padding: 14,
@@ -347,11 +369,12 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 20,
     left: 16,
-    right: 16,
+    right: 16 
   },
-  clearButtonText: {
+
+  clearButtonText: { 
     color: 'white',
     fontWeight: '700',
-    fontSize: 15,
-  },
+    fontSize: 15 
+  }
 });
