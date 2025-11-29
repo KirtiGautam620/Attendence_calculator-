@@ -10,7 +10,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 export default function StudentsScreen() {
   const router = useRouter();
   const [batches, setBatches] = useState([]);
@@ -25,144 +25,143 @@ export default function StudentsScreen() {
   });
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
-
-  const dummyBatches = [
-    { _id: "b1", name: "Batch A" },
-    { _id: "b2", name: "Batch B" },
-  ];
-
-  const dummyStudents = [
-    {
-      _id: "s1",
-      name: "Rohit Sharma",
-      rollNumber: "21",
-      batch: { _id: "b1", name: "Batch A" },
-      contactNumber: "9876543210",
-    },
-    {
-      _id: "s2",
-      name: "Neha Verma",
-      rollNumber: "14",
-      batch: { _id: "b2", name: "Batch B" },
-      contactNumber: "9823123499",
-    },
-  ];
-
-  useEffect(() => {
-    setBatches(dummyBatches);
-    setForm(prev => ({
-      ...prev,
-      batch: prev.batch || "b1",
-    }));
-  }, []);
-
-  const loadStudents = (batchId = '') => {
-    setLoading(true);
-    setTimeout(() => {
-      if (batchId) {
-        setStudents(dummyStudents.filter(s => s.batch._id === batchId));
-      } else {
-        setStudents(dummyStudents);
-      }
-      setLoading(false);
-    }, 400);
+  const loadBatches = async () => {
+    const stored = await AsyncStorage.getItem('batches');
+    const parsed = stored ? JSON.parse(stored) : [];
+    setBatches(parsed);
+    setForm((prev) => ({ ...prev, batch: parsed[0]?._id || '' }));
   };
-
+  const loadStudents = async (batchId = '') => {
+    setLoading(true);
+    const stored = await AsyncStorage.getItem('students');
+    const parsed = stored ? JSON.parse(stored) : [];
+    if (batchId) {
+      setStudents(parsed.filter((s) => s.batch === batchId));
+    } else {
+      setStudents(parsed);
+    }
+    setLoading(false);
+  };
+  useEffect(() => {
+    loadBatches();
+    loadStudents();
+  }, []);
   useEffect(() => {
     loadStudents(selectedBatchFilter);
   }, [selectedBatchFilter]);
-
-  const handleSubmit = () => {
-    if (!form.name.trim() || !form.rollNumber.trim() || !form.batch) return;
+  const saveStudents = async (newStudents) => {
+    await AsyncStorage.setItem('students', JSON.stringify(newStudents));
+  };
+  const handleSubmit = async () => {
+    if (!form.name.trim()) return;
+    if (!form.rollNumber.trim()) return;
+    if (!form.batch) return;
     setSaving(true);
-
-    setTimeout(() => {
-      if (form._id) {
-        const student = dummyStudents.find((s) => s._id === form._id);
-        if (student) {
-          student.name = form.name;
-          student.rollNumber = form.rollNumber;
-          student.batch = dummyBatches.find(b => b._id === form.batch);
-          student.contactNumber = form.contactNumber;
-        }
-      } else {
-        dummyStudents.push({
-          _id: "s" + (dummyStudents.length + 1),
-          name: form.name,
-          rollNumber: form.rollNumber,
-          batch: dummyBatches.find(b => b._id === form.batch),
-          contactNumber: form.contactNumber,
-        });
+    const stored = await AsyncStorage.getItem('students');
+    const currentStudents = stored ? JSON.parse(stored) : [];
+    if (form._id) {
+      const index = currentStudents.findIndex((s) => s._id === form._id);
+      if (index !== -1) {
+        currentStudents[index] = { ...form };
       }
-
-      setForm({ name: "", rollNumber: "", batch: form.batch, contactNumber: "", _id: null });
-      loadStudents(selectedBatchFilter);
-      setSaving(false);
-    }, 500);
-  };
-
-  const handleEdit = (student) => {
+    } else {
+      currentStudents.push({
+        _id: Date.now().toString(),
+        name: form.name,
+        rollNumber: form.rollNumber,
+        batch: form.batch,
+        contactNumber: form.contactNumber,
+      });
+    }
+    await saveStudents(currentStudents);
     setForm({
-      name: student.name,
-      rollNumber: student.rollNumber,
-      batch: student.batch._id,
-      contactNumber: student.contactNumber,
-      _id: student._id,
+      name: '',
+      rollNumber: '',
+      batch: batches[0]?._id || '',
+      contactNumber: '',
+      _id: null,
     });
+    loadStudents(selectedBatchFilter);
+    setSaving(false);
   };
-
-  const handleDelete = (id) => {
-    const index = dummyStudents.findIndex((s) => s._id === id);
-    if (index !== -1) dummyStudents.splice(index, 1);
+  const handleEdit = (student) => {
+    setForm({ ...student });
+  };
+  const handleDelete = async (id) => {
+    const stored = await AsyncStorage.getItem('students');
+    const currentStudents = stored ? JSON.parse(stored) : [];
+    const filtered = currentStudents.filter((s) => s._id !== id);
+    await saveStudents(filtered);
     loadStudents(selectedBatchFilter);
   };
-
   return (
-    <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 40 }}>
-      <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={{ paddingBottom: 40 }}
+    >
+      <TouchableOpacity
+        onPress={() => router.back()}
+        style={styles.backButton}
+      >
         <Text style={styles.backButtonText}>← Back</Text>
       </TouchableOpacity>
-
       <Text style={styles.header}>Add / Edit Student</Text>
       <View style={styles.card}>
         <TextInput
           style={styles.input}
           placeholder="Full name"
-          placeholderTextColor="#94a3b8"
+          placeholderTextColor="#94A3B8"
           value={form.name}
-          onChangeText={(text) => setForm((prev) => ({ ...prev, name: text }))}
+          onChangeText={(text) =>
+            setForm((prev) => ({ ...prev, name: text }))
+          }
         />
         <TextInput
           style={styles.input}
           placeholder="Roll number"
-          placeholderTextColor="#94a3b8"
+          placeholderTextColor="#94A3B8"
           value={form.rollNumber}
-          onChangeText={(text) => setForm((prev) => ({ ...prev, rollNumber: text }))}
+          onChangeText={(text) =>
+            setForm((prev) => ({ ...prev, rollNumber: text }))
+          }
         />
         <View style={styles.pickerWrapper}>
           <Picker
             selectedValue={form.batch}
             onValueChange={(value) => setForm((prev) => ({ ...prev, batch: value }))}
             style={styles.picker}
-            dropdownIconColor="#38bdf8"
+            dropdownIconColor="#38BDF8"
           >
+            <Picker.Item label="Select batch" value="" color="#888" />
             {batches.map((batch) => (
-              <Picker.Item key={batch._id} label={batch.name} value={batch._id} color="#070707ff" />
+              <Picker.Item
+                key={batch._id}
+                label={batch.name}
+                value={batch._id}
+                color="#070707ff"
+              />
             ))}
           </Picker>
         </View>
         <TextInput
           style={styles.input}
           placeholder="Contact number"
-          placeholderTextColor="#94a3b8"
+          placeholderTextColor="#94A3B8"
           value={form.contactNumber}
-          onChangeText={(text) => setForm((prev) => ({ ...prev, contactNumber: text }))}
+          onChangeText={(text) =>
+            setForm((prev) => ({ ...prev, contactNumber: text }))
+          }
         />
-        <TouchableOpacity style={styles.button} onPress={handleSubmit} disabled={saving}>
-          <Text style={styles.buttonText}>{saving ? 'Saving…' : form._id ? 'Update Student' : 'Save Student'}</Text>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={handleSubmit}
+          disabled={saving}
+        >
+          <Text style={styles.buttonText}>
+            {saving ? 'Saving…' : form._id ? 'Update Student' : 'Save Student'}
+          </Text>
         </TouchableOpacity>
       </View>
-
       <View style={styles.listHeader}>
         <Text style={styles.header}>Students</Text>
         <View style={[styles.pickerWrapper, { width: 180 }]}>
@@ -170,54 +169,75 @@ export default function StudentsScreen() {
             selectedValue={selectedBatchFilter}
             onValueChange={setSelectedBatchFilter}
             style={styles.picker}
-            dropdownIconColor="#38bdf8"
+            dropdownIconColor="#38BDF8"
           >
             <Picker.Item label="All batches" value="" color="#121312ff" />
             {batches.map((batch) => (
-              <Picker.Item key={batch._id} label={batch.name} value={batch._id} color="#050505ff" />
+              <Picker.Item
+                key={batch._id}
+                label={batch.name}
+                value={batch._id}
+                color="#050505ff"
+              />
             ))}
           </Picker>
         </View>
       </View>
-
       {loading ? (
-        <ActivityIndicator color="#22c55e" />
+        <ActivityIndicator color="#22C55E" />
       ) : students.length ? (
         students.map((student) => (
           <View key={student._id} style={styles.studentCard}>
             <View>
               <Text style={styles.studentName}>
                 {student.name}{' '}
-                <Text style={{ color: '#d1fae5', fontSize: 13 }}>#{student.rollNumber}</Text>
+                <Text style={{ color: '#D1FAE5', fontSize: 13 }}>
+                  #{student.rollNumber}
+                </Text>
               </Text>
-              {typeof student.batch === 'object' && student.batch ? (
-                <Text style={styles.studentMeta}>{student.batch.name}</Text>
+              {student.batch ? (
+                <Text style={styles.studentMeta}>
+                  {batches.find((b) => b._id === student.batch)?.name}
+                </Text>
               ) : null}
               {student.contactNumber ? (
-                <Text style={styles.studentContact}>☎ {student.contactNumber}</Text>
+                <Text style={styles.studentContact}>
+                  :phone: {student.contactNumber}
+                </Text>
               ) : null}
             </View>
-
             <View style={{ flexDirection: 'row', gap: 10, marginTop: 10 }}>
               <TouchableOpacity
-                style={[styles.actionButton, { backgroundColor: '#fbbf24' }]}
+                style={[styles.actionButton, { backgroundColor: '#FBBF24' }]}
                 onPress={() => handleEdit(student)}
               >
                 <Text style={styles.actionText}>Edit</Text>
               </TouchableOpacity>
-
               <TouchableOpacity
-                style={[styles.actionButton, { backgroundColor: '#ef4444' }]}
+                style={[styles.actionButton, { backgroundColor: '#EF4444' }]}
                 onPress={() => handleDelete(student._id)}
               >
                 <Text style={styles.actionText}>Delete</Text>
               </TouchableOpacity>
-
               <TouchableOpacity
-                style={{ backgroundColor: "#38bdf8", padding: 10, borderRadius: 12, marginVertical: 10 }}
-                onPress={() => router.push("/(tabs)/studentqr")}
+                style={{
+                  backgroundColor: '#38BDF8',
+                  paddingVertical: 10,
+                  paddingHorizontal: 10,
+                  borderRadius: 12,
+                  marginVertical: 10,
+                }}
+                onPress={() => router.push('/(tabs)/studentqr')}
               >
-                <Text style={{ color: "white", fontWeight: "600", textAlign: "center" }}>QR</Text>
+                <Text
+                  style={{
+                    color: 'white',
+                    fontWeight: '600',
+                    textAlign: 'center',
+                  }}
+                >
+                  QR
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -228,7 +248,6 @@ export default function StudentsScreen() {
     </ScrollView>
   );
 }
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -244,7 +263,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   backButtonText: {
-    color: '#e2f7eb',
+    color: '#E2F7EB',
     fontSize: 14,
     fontWeight: '600',
   },
@@ -252,19 +271,21 @@ const styles = StyleSheet.create({
     color: '#161717ff',
     fontSize: 18,
     fontWeight: '600',
-    marginVertical: 12,
+    marginTop: 12,
+    marginBottom: 12,
   },
   card: {
     backgroundColor: '#0b4029ff',
     borderRadius: 20,
-    padding: 16,
+    paddingVertical: 16,
+    paddingHorizontal: 16,
     gap: 10,
   },
   input: {
     backgroundColor: '#ecf1efff',
     borderRadius: 12,
-    paddingHorizontal: 14,
     paddingVertical: 12,
+    paddingHorizontal: 14,
     color: '#0c0c0cff',
     marginBottom: 10,
   },
@@ -272,35 +293,38 @@ const styles = StyleSheet.create({
     backgroundColor: '#d0d4d3ff',
     borderRadius: 12,
     marginBottom: 10,
-    borderColor:"black",
+    borderColor: 'black',
+    borderWidth: 1,
   },
   picker: {
     color: '#0b0b0bff',
   },
   button: {
-    backgroundColor: '#22c55e',
+    backgroundColor: '#22C55E',
     borderRadius: 14,
     paddingVertical: 12,
     alignItems: 'center',
     marginTop: 4,
   },
   buttonText: {
-    color: '#064e2f',
+    color: '#064E2F',
     fontWeight: '600',
   },
   listHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginVertical: 12,
+    marginTop: 12,
+    marginBottom: 12,
   },
   studentCard: {
-    backgroundColor: '#0b3e28',
+    backgroundColor: '#0B3E28',
     borderRadius: 18,
-    padding: 16,
+    paddingVertical: 16,
+    paddingHorizontal: 16,
     marginBottom: 12,
     borderWidth: 1,
-    borderColor: '#1e293b',
+    borderColor: '#1E293B',
   },
   studentName: {
     color: '#ede8e8ff',
@@ -308,38 +332,28 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   studentMeta: {
-    color: '#a7f3d0',
+    color: '#A7F3D0',
     marginTop: 4,
   },
   studentContact: {
-    color: '#a7f3d0',
-    marginTop: 6,
+    color: '#A7F3D0',
     fontSize: 13,
+    marginTop: 6,
   },
   empty: {
-    color: '#a7f3d0',
+    color: '#A7F3D0',
     textAlign: 'center',
     marginTop: 20,
   },
   actionButton: {
-    flex:1,
+    flex: 1,
     flexDirection: 'row',
     justifyContent: 'center',
-    borderRadius: 12,
     alignItems: 'center',
+    borderRadius: 12,
   },
   actionText: {
-    color: '#f8fafc',
+    color: '#F8FAFC',
     fontWeight: '600',
   },
 });
-
-
-
-
-
-
-
-
-
-
