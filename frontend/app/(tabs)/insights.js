@@ -246,7 +246,7 @@ const styles = StyleSheet.create({
   backButton: { 
     paddingVertical: 6, 
     paddingHorizontal: 12, 
-    backgroundColor: '#0c3b2eff', 
+    backgroundColor: '#42ab65ff',
     borderRadius: 10, 
     alignSelf: 'flex-start', 
     marginBottom: 10 
@@ -266,7 +266,7 @@ const styles = StyleSheet.create({
   },
 
   card: { 
-    backgroundColor: '#246d3dff', 
+    backgroundColor: '#42ab65ff',
     borderRadius: 24, 
     padding: 16, 
     borderWidth: 1, 
@@ -305,12 +305,12 @@ const styles = StyleSheet.create({
   },
 
   statLabel: { 
-    color: '#cbd5f5', 
+    color: '#f7f7f7ff', 
     fontSize: 12 
   },
 
   historyTitle: { 
-    color: '#cbd5f5', 
+    color: '#ffffffff', 
     fontWeight: '600', 
     marginTop: 16, 
     marginBottom: 8 
@@ -325,11 +325,11 @@ const styles = StyleSheet.create({
   },
 
   historyDate: { 
-    color: '#f8fafc' 
+    color: '#fdfdfdff' 
   },
 
   historyStatus: (s) => ({ 
-    color: s === 'PRESENT' ? '#22c55e' : s === 'ABSENT' ? '#ef4444' : '#fbbf24', 
+    color: s === 'PRESENT' ? '#fcfffdff' : s === 'ABSENT' ? '#ef4444' : '#fbbf24', 
     fontWeight: '600' 
   }),
 
@@ -341,7 +341,7 @@ const styles = StyleSheet.create({
   },
 
   datePickerButton: { 
-    backgroundColor: '#f0f2f6ff', 
+    backgroundColor: '#ffffffff', 
     borderRadius: 12, 
     paddingHorizontal: 13, 
     paddingVertical: 9, 
@@ -365,14 +365,14 @@ const styles = StyleSheet.create({
   },
 
   datePickerDoneText: { 
-    color: '#14532d', 
+    color: '#fdfdfdff', 
     fontWeight: '700', 
     fontSize: 14, 
     textAlign: 'center' 
   },
 
   empty: { 
-    color: '#94a3b8', 
+    color: '#ffffffff', 
     textAlign: 'center', 
     marginVertical: 16 
   }
