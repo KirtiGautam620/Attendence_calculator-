@@ -49,7 +49,6 @@ export default function AttendanceScreen() {
     loadStudents();
   }, []);
 
-  // Whenever batch changes, populate rows with registered students of that batch
   useEffect(() => {
     if (!selectedBatch) return;
 
@@ -75,8 +74,6 @@ export default function AttendanceScreen() {
   const handleSave = async () => {
     setSaving(true);
 
-    // You can optionally save attendance per student here
-    // For simplicity, we will just save it in AsyncStorage under batch attendance
     const storedAttendance = await AsyncStorage.getItem('attendance');
     const parsedAttendance = storedAttendance ? JSON.parse(storedAttendance) : {};
 
