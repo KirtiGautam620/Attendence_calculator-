@@ -1,7 +1,9 @@
 import { Picker } from '@react-native-picker/picker';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
+  Platform,
   ScrollView,
   StyleSheet,
   Text,
@@ -23,6 +25,7 @@ export default function InsightsScreen() {
   const [selectedStudent, setSelectedStudent] = useState('');
 
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+  const [showDatePicker, setShowDatePicker] = useState(false);
   const [month, setMonth] = useState(String(new Date().getMonth() + 1));
   const [year, setYear] = useState(String(new Date().getFullYear()));
   const [threshold, setThreshold] = useState('75');
@@ -50,6 +53,16 @@ export default function InsightsScreen() {
 
     if (bb.length) setSelectedBatch(bb[0]._id);
     if (ss.length) setSelectedStudent(ss[0]._id);
+  };
+
+  const handleDateChange = (event, selectedDate) => {
+    if (Platform.OS === 'android') {
+      setShowDatePicker(false);
+    }
+    if (selectedDate) {
+      const formattedDate = selectedDate.toISOString().split('T')[0];
+      setDate(formattedDate);
+    }
   };
 
   useEffect(() => {
@@ -234,7 +247,30 @@ export default function InsightsScreen() {
             </Picker>
           </View>
 
-          <TextInput style={styles.input} value={date} onChangeText={setDate} />
+          <TouchableOpacity
+            style={styles.datePickerButton}
+            onPress={() => setShowDatePicker(true)}
+          >
+            <Text style={styles.datePickerButtonText}>{date}</Text>
+          </TouchableOpacity>
+
+          {showDatePicker && (
+            <DateTimePicker
+              value={new Date(date)}
+              mode="date"
+              display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+              onChange={handleDateChange}
+              onTouchCancel={() => setShowDatePicker(false)}
+            />
+          )}
+          {Platform.OS === 'ios' && showDatePicker && (
+            <TouchableOpacity
+              style={styles.datePickerDone}
+              onPress={() => setShowDatePicker(false)}
+            >
+              <Text style={styles.datePickerDoneText}>Done</Text>
+            </TouchableOpacity>
+          )}
         </View>
 
         {loadingBatch ? (
@@ -341,6 +377,33 @@ const styles = StyleSheet.create({
     paddingHorizontal: 13,
     paddingVertical: 9,
     color: '#0f1010ff',
+  },
+  datePickerButton: {
+    backgroundColor: '#f0f2f6ff',
+    borderRadius: 12,
+    paddingHorizontal: 13,
+    paddingVertical: 9,
+    justifyContent: 'center',
+    alignItems: 'center',
+    minWidth: 120,
+  },
+  datePickerButtonText: {
+    color: '#0f1010ff',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  datePickerDone: {
+    backgroundColor: '#22c55e',
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    marginTop: 12,
+  },
+  datePickerDoneText: {
+    color: '#14532d',
+    fontWeight: '700',
+    fontSize: 14,
+    textAlign: 'center',
   },
   empty: { color: '#94a3b8', textAlign: 'center', marginVertical: 16 },
   defaulterRow: {
